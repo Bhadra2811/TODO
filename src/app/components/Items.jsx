@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-// import { FaEdit, FaTrash } from "./react-icons";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 function Item({ item, todos, setTodos }) {
   const [editing, setEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(item.title);
+  const [editDescription, setEditDescription] = useState(item.description);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -16,15 +18,20 @@ function Item({ item, todos, setTodos }) {
   }, [editing]);
 
   const handleInputChange = (e) => {
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === item.id ? { ...todo, title: e.target.value } : todo
-      )
-    );
+    setEditTitle(e.target.value);
+  };
+
+  const handleDescriptionChange = (e) => {
+    setEditDescription(e.target.value);
   };
 
   const handleInputSubmit = (event) => {
     event.preventDefault();
+    setTodos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === item.id ? { ...todo, title: editTitle, description: editDescription } : todo
+      )
+    );
     setEditing(false);
   };
 
@@ -72,45 +79,61 @@ function Item({ item, todos, setTodos }) {
               type="text"
               name="edit-todo"
               id="edit-todo"
-              defaultValue={item?.title}
+              value={editTitle}
               onBlur={handleInputBlur}
               onChange={handleInputChange}
             />
           </label>
+          <label htmlFor="edit-description">
+            <textarea
+              name="edit-description"
+              id="edit-description"
+              value={editDescription}
+              onChange={handleDescriptionChange}
+            />
+          </label>
+          <button type="submit">Save</button>
         </form>
       ) : (
         <>
-          <p
-            style={
-              item.is_doing
-                ? { textDecoration: "underline", color: "#FFD700" }
-                : item.is_completed
-                ? { textDecoration: "line-through" }
-                : {}
-            }
-          >
-            {item?.title}
-          </p>
-          <select
-            value={
-              item.is_completed
-                ? "Done"
-                : item.is_doing
-                ? "Doing"
-                : "To-Do"
-            }
-            onChange={handleStatusChange}
-          >
-            <option value="To-Do">To-Do</option>
-            <option value="Doing">Doing</option>
-            <option value="Done">Done</option>
-          </select>
-          <button onClick={() => setEditing(true)}>
-            <FaEdit />
-          </button>
-          <button onClick={handleDelete}>
-            <FaTrash />
-          </button>
+          <div className="todo_items_left">
+            <p
+              style={
+                item.is_doing
+                  ? { textDecoration: "underline", color: "#FFD700" }
+                  : item.is_completed
+                  ? { textDecoration: "line-through" }
+                  : {}
+              }
+            >
+              {item?.title}
+            </p>
+          </div>
+          <div className="todo_description">
+            {item?.description}
+          </div>
+          <div className="todo_items_right">
+            <select
+              value={
+                item.is_completed
+                  ? "Done"
+                  : item.is_doing
+                  ? "Doing"
+                  : "To-Do"
+              }
+              onChange={handleStatusChange}
+            >
+              <option value="To-Do">To-Do</option>
+              <option value="Doing">Doing</option>
+              <option value="Done">Done</option>
+            </select>
+            <button onClick={() => setEditing(true)}>
+              <FaEdit />
+            </button>
+            <button onClick={handleDelete}>
+              <FaTrash />
+            </button>
+          </div>
         </>
       )}
     </li>
